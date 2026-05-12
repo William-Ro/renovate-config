@@ -41,42 +41,9 @@
       "semanticCommitScope": "container"
     },
     {
-      "matchDatasources": ["go", "golang-version"],
-      "semanticCommitType": "fix",
-      "semanticCommitScope": "go"
-    },
-    {
       "matchDatasources": ["helm"],
       "semanticCommitType": "fix",
       "semanticCommitScope": "helm"
-    },
-    {
-      "matchDatasources": ["npm", "node-version"],
-      "matchDepTypes": "dependencies",
-      "semanticCommitType": "fix",
-      "semanticCommitScope": "node"
-    },
-    {
-      "matchDatasources": ["npm", "node-version"],
-      "matchDepTypes": "devDependencies",
-      "semanticCommitType": "chore",
-      "semanticCommitScope": "npm",
-      "commitMessagePrefix": "{{semanticCommitType}}({{semanticCommitScope}}):"
-    },
-    {
-      "matchDatasources": ["pypi", "python-version"],
-      "semanticCommitType": "fix",
-      "semanticCommitScope": "python"
-    },
-    {
-      "matchDatasources": ["rubygems", "ruby-version"],
-      "semanticCommitType": "fix",
-      "semanticCommitScope": "ruby"
-    },
-    {
-      "matchDatasources": ["terraform-module", "terraform-provider"],
-      "semanticCommitType": "fix",
-      "semanticCommitScope": "terraform"
     },
 
     // Semantic Commit Managers Scopes
@@ -86,14 +53,14 @@
       "semanticCommitScope": "github-action"
     },
     {
-      "matchManagers": ["mise"],
-      "semanticCommitType": "chore",
-      "semanticCommitScope": "mise"
+      "matchManagers": ["nix"],
+      "semanticCommitType": "fix",
+      "semanticCommitScope": "nix"
     },
 
-    // Remove "!" from major updates for mise and GitHub Actions
+    // Remove "!" from major updates for GitHub Actions and Nix
     {
-      "matchManagers": ["github-actions", "mise"],
+      "matchManagers": ["github-actions", "nix"],
       "matchUpdateTypes": ["major"],
       "commitMessagePrefix": "{{semanticCommitType}}({{semanticCommitScope}}):"
     }

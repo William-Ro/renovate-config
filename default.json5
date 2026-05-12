@@ -6,6 +6,9 @@
   "gitAuthor": "north-no-2[bot] <277911232+north-no-2[bot]@users.noreply.github.com>",
   "rebaseWhen": "behind-base-branch",
   "rebaseStalePrs": true,
+  "nix": {
+    "enabled": true
+  },
   "extends": [
     ":disableRateLimiting",
     "config:recommended",
@@ -49,26 +52,16 @@
       "addLabels": ["renovate/github-release"]
     },
     { "matchDatasources": ["docker"], "addLabels": ["renovate/container"] },
-    {
-      "matchDatasources": ["go", "golang-version"],
-      "addLabels": ["renovate/go"]
-    },
     { "matchDatasources": ["helm"], "addLabels": ["renovate/helm"] },
     {
-      "matchDatasources": ["npm", "node-version"],
-      "addLabels": ["renovate/node"]
+      "matchManagers": ["github-actions"],
+      "addLabels": ["renovate/github-action"]
     },
+
+    // NixOS / Nix
     {
-      "matchDatasources": ["pypi", "python-version"],
-      "addLabels": ["renovate/python"]
-    },
-    {
-      "matchDatasources": ["rubygems", "ruby-version"],
-      "addLabels": ["renovate/ruby"]
-    },
-    {
-      "matchDatasources": ["terraform-module", "terraform-provider"],
-      "addLabels": ["renovate/terraform"]
+      "matchManagers": ["nix"],
+      "addLabels": ["renovate/nix"]
     }
   ]
 }
