@@ -1,2 +1,4 @@
+# Force JSON5 and YAML to appear in language stats
+*.json5 linguist-detectable=true
 *.yaml linguist-detectable=true
 *.yml linguist-detectable=true
