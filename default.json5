@@ -5,7 +5,6 @@
   "timezone": "America/Costa_Rica",
   "gitAuthor": "north-no-2[bot] <277911232+north-no-2[bot]@users.noreply.github.com>",
   "rebaseWhen": "behind-base-branch",
-  "rebaseStalePrs": true,
   "nix": {
     "enabled": true
   },
@@ -29,15 +28,22 @@
     },
 
     // Auto Merge Types
+    // patch/digest/pin: merge directly to branch — no PR created
     {
-      "matchUpdateTypes": ["minor", "patch", "pin", "digest", "pinDigest"],
+      "matchUpdateTypes": ["patch", "pin", "digest", "pinDigest"],
       "automerge": true,
-      "automergeType": "pr"
+      "automergeType": "branch"
+    },
+    // minor: PR created, auto-merged by platform when CI passes
+    {
+      "matchUpdateTypes": ["minor"],
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": true
     },
     {
       "matchUpdateTypes": ["major"],
-      "automerge": false,
-      "automergeType": "pr"
+      "automerge": false
     },
 
     // Type Labels
