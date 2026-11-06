@@ -39,7 +39,9 @@
     {
       "matchUpdateTypes": ["major"],
       "automerge": false,
-      "automergeType": "pr"
+      "automergeType": "pr",
+      // Don't auto-open major PRs that then sit around getting rebased on every base-branch push
+      "dependencyDashboardApproval": true
     },
 
     // Type Labels
