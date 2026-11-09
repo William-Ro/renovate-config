@@ -50,7 +50,7 @@
       "schedule": ["before 6am on monday"]
     },
 
-    // Everything but major merges straight to the branch (no PR). Majors open a PR, only once approved on the dashboard.
+    // Everything except major merges straight to the base branch; majors open a PR.
     {
       "matchUpdateTypes": ["minor", "patch", "pin", "digest", "pinDigest"],
       "automerge": true,
@@ -58,7 +58,6 @@
     },
     {
       "matchUpdateTypes": ["major"],
-      "dependencyDashboardApproval": true,
       "commitMessagePrefix": "{{semanticCommitType}}({{semanticCommitScope}})!:"
     },
     {
