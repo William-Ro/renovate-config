@@ -1,36 +1,56 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    ":disableRateLimiting",
+    "config:recommended",
+    "helpers:pinGitHubActionDigests"
+  ],
   "dependencyDashboard": true,
   "dependencyDashboardTitle": "Renovate Dashboard",
   "timezone": "America/Costa_Rica",
   "gitAuthor": "north-no-2[bot] <277911232+north-no-2[bot]@users.noreply.github.com>",
   "gitIgnoredAuthors": ["noreply@github.com"],
   "rebaseWhen": "behind-base-branch",
-  "rebaseStalePrs": true,
-  "nix": {
-    "enabled": true
-  },
-  "extends": [
-    ":disableRateLimiting",
-    "config:recommended",
-    "helpers:pinGitHubActionDigests",
-    "github>William-Ro/renovate-config//semantic-commits.json5",
-    "github>William-Ro/renovate-config//custom-manager-github-links.json5",
-    "github>William-Ro/renovate-config//custom-manager-yaml.json5",
-    "github>William-Ro/renovate-config//custom-manager-actions.json5"
+  "nix": { "enabled": true },
+
+  // No review step, so hold releases for 3 days to let malicious publishes get caught.
+  // timestamp-optional: GHCR/Quay don't expose release timestamps and would be held forever otherwise.
+  "minimumReleaseAge": "3 days",
+  "minimumReleaseAgeBehaviour": "timestamp-optional",
+  "osvVulnerabilityAlerts": true,
+
+  // Commit format: fix(container): update <dep> ( old → new )
+  "semanticCommits": "enabled",
+  "commitBodyTable": true,
+  "semanticCommitType": "fix",
+  "commitMessageTopic": "{{depName}}",
+  "commitMessageExtra": "( {{currentVersion}} → {{newVersion}} )",
+  "commitMessageSuffix": "",
+
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Dependencies annotated with `# renovate: depName=... [datasource=...]` in YAML",
+      "managerFilePatterns": ["/\\.ya?ml(\\.j2)?$/"],
+      "matchStrings": [
+        "\\S+: \"?(?<currentValue>[^\"\\s]+)\"? # ?renovate: depName=(?<depName>\\S+)( datasource=(?<datasource>\\S+))?( versioning=(?<versioning>\\S+))?( extractVersion=(?<extractVersion>\\S+))?( packageName=(?<packageName>\\S+))?",
+        "(?m:^[ \\t]*?# ?renovate: depName=(?<depName>\\S+)( datasource=(?<datasource>\\S+))?( versioning=(?<versioning>\\S+))?( extractVersion=(?<extractVersion>\\S+))?( packageName=(?<packageName>\\S+))?\\n[ \\t ]*?\\S+: \"?(?<currentValue>[^\" ]+?)\"?$)"
+      ],
+      "datasourceTemplate": "{{#if datasource}}{{{datasource}}}{{else}}github-releases{{/if}}",
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
+      "extractVersionTemplate": "{{#if extractVersion}}{{{extractVersion}}}{{else}}^(?<version>.*)${{/if}}",
+      "packageNameTemplate": "{{#if packageName}}{{{packageName}}}{{else}}{{{depName}}}{{/if}}"
+    }
   ],
+
   "packageRules": [
-    // Package Scheduling
+    // Later rules override earlier ones.
     {
       "matchPackageNames": ["renovate"],
-      "schedule": ["before 6am on monday"],
-      "automerge": true,
-      "automergeType": "branch",
-      "addLabels": ["renovate/weekly-schedule"]
+      "schedule": ["before 6am on monday"]
     },
 
-    // Auto Merge Types
-    // minor/patch/digest/pin: merge directly to branch — no PR created
+    // Everything but major merges straight to the branch (no PR). Majors open a PR, only once approved on the dashboard.
     {
       "matchUpdateTypes": ["minor", "patch", "pin", "digest", "pinDigest"],
       "automerge": true,
@@ -38,34 +58,22 @@
     },
     {
       "matchUpdateTypes": ["major"],
-      "automerge": false,
-      "automergeType": "pr",
-      // Don't auto-open major PRs that then sit around getting rebased on every base-branch push
-      "dependencyDashboardApproval": true
+      "dependencyDashboardApproval": true,
+      "commitMessagePrefix": "{{semanticCommitType}}({{semanticCommitScope}})!:"
     },
-
-    // Type Labels
-    { "matchUpdateTypes": ["major"], "labels": ["type/major"] },
-    { "matchUpdateTypes": ["minor"], "labels": ["type/minor"] },
-    { "matchUpdateTypes": ["patch"], "labels": ["type/patch"] },
-    { "matchUpdateTypes": ["digest"], "labels": ["type/digest"] },
-
-    // Datasource Labels
     {
-      "matchDatasources": ["github-releases", "github-tags"],
-      "addLabels": ["renovate/github-release"]
+      "matchUpdateTypes": ["digest"],
+      "commitMessageExtra": "( {{currentDigestShort}} → {{newDigestShort}} )"
     },
-    { "matchDatasources": ["docker"], "addLabels": ["renovate/container"] },
-    { "matchDatasources": ["helm"], "addLabels": ["renovate/helm"] },
+
+    // Commit scopes
+    { "matchDatasources": ["docker"], "semanticCommitScope": "container" },
+    { "matchDatasources": ["helm"], "semanticCommitScope": "helm" },
+    { "matchManagers": ["nix"], "semanticCommitScope": "nix" },
     {
       "matchManagers": ["github-actions"],
-      "addLabels": ["renovate/github-action"]
-    },
-
-    // NixOS / Nix
-    {
-      "matchManagers": ["nix"],
-      "addLabels": ["renovate/nix"]
+      "semanticCommitType": "ci",
+      "semanticCommitScope": "github-action"
     }
   ]
 }
