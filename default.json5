@@ -13,10 +13,7 @@
   "rebaseWhen": "behind-base-branch",
   "nix": { "enabled": true },
 
-  // No review step, so hold releases for 3 days to let malicious publishes get caught.
-  // timestamp-optional: GHCR/Quay don't expose release timestamps and would be held forever otherwise.
-  "minimumReleaseAge": "3 days",
-  "minimumReleaseAgeBehaviour": "timestamp-optional",
+  // Raises immediate fix PRs for versions OSV flags as vulnerable/malicious.
   "osvVulnerabilityAlerts": true,
 
   // Commit format: fix(container): update <dep> ( old → new )
